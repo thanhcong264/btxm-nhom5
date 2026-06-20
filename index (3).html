@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trạm khảo sát trám vá mặt đường BTXM — Nhóm 5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EBE7DD;
+    --panel:#F8F6F0;
+    --panel-2:#FFFFFF;
+    --ink:#23241F;
+    --ink-soft:#69675D;
+    --accent:#E2611C;
+    --accent-ink:#7A2E0B;
+    --accent-2:#C99A3A;
+    --good:#4F7942;
+    --bad:#A8392E;
+    --line:#D2CBB8;
+    --line-strong:#B6AD93;
+    --radius:10px;
+    --mono:'IBM Plex Mono', monospace;
+    --display:'Space Grotesk', sans-serif;
+    --body:'Inter', sans-serif;
+    --shadow: 0 1px 0 rgba(35,36,31,0.04), 0 8px 20px -10px rgba(35,36,31,0.18);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      repeating-linear-gradient(0deg, rgba(35,36,31,0.025) 0 1px, transparent 1px 24px),
+      repeating-linear-gradient(90deg, rgba(35,36,31,0.025) 0 1px, transparent 1px 24px),
+      var(--paper);
+    color:var(--ink);
+    font-family:var(--body);
+    -webkit-font-smoothing:antialiased;
+  }
+  button{font-family:inherit;cursor:pointer;}
+  input{font-family:inherit;}
+  .app{max-width:1480px;margin:0 auto;padding:18px 18px 60px;}
+
+  .titleblock{
+    display:flex;justify-content:space-between;align-items:stretch;gap:0;
+    background:var(--panel-2);
+    border:1.5px solid var(--ink);
+    border-radius:var(--radius);
+    overflow:hidden;
+    box-shadow:var(--shadow);
+    margin-bottom:16px;
+  }
+  .titleblock__left{
+    padding:18px 22px;flex:1;min-width:0;
+    display:flex;flex-direction:column;gap:6px;justify-content:center;
+  }
+  .eyebrow{
+    font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--accent-ink);font-weight:600;
+  }
+  .titleblock__left h1{
+    font-family:var(--display);font-size:clamp(18px,2.4vw,26px);line-height:1.15;margin:0;
+    font-weight:600;letter-spacing:-0.01em;
+  }
+  .titleblock__stamp{
+    display:flex;border-left:1.5px solid var(--ink);
+  }
+  .stamp-row{
+    display:flex;flex-direction:column;justify-content:center;gap:4px;
+    padding:12px 18px;border-left:1px solid var(--line-strong);min-width:108px;
+  }
+  .stamp-row:first-child{border-left:none;}
+  .stamp-row span{font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--ink-soft);text-transform:uppercase;}
+  .stamp-row strong{font-family:var(--mono);font-size:15px;color:var(--ink);}
+
+  .layout{display:grid;grid-template-columns:248px minmax(0,1fr) 340px;gap:14px;align-items:start;}
+  @media (max-width:1180px){ .layout{grid-template-columns:1fr;} }
+
+  .panel-card{
+    background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);
+  }
+
+  .nav-panel{padding:12px;max-height:calc(100vh - 140px);overflow:auto;position:sticky;top:18px;}
+  .nav-panel h2{font-family:var(--display);font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);margin:4px 6px 10px;}
+  details.doan{border:1px solid var(--line);border-radius:8px;margin-bottom:8px;overflow:hidden;background:var(--panel);}
+  details.doan[open]{border-color:var(--line-strong);}
+  details.doan summary{
+    list-style:none;cursor:pointer;padding:9px 10px;display:flex;align-items:center;justify-content:space-between;
+    font-family:var(--display);font-weight:600;font-size:13.5px;
+  }
+  details.doan summary::-webkit-details-marker{display:none;}
+  details.doan summary::before{content:"▸";display:inline-block;margin-right:8px;transition:transform .15s;color:var(--accent);}
+  details.doan[open] summary::before{transform:rotate(90deg);}
+  .doan-badge{font-family:var(--mono);font-size:11px;color:var(--ink-soft);background:var(--panel-2);border:1px solid var(--line);border-radius:20px;padding:1px 8px;}
+  .phandoan-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:6px 8px 10px;}
+  .pd-btn{
+    border:1px solid var(--line);background:var(--panel-2);border-radius:6px;padding:6px 4px;
+    font-family:var(--mono);font-size:11.5px;text-align:center;color:var(--ink);
+    display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.2;
+  }
+  .pd-btn .dot{width:6px;height:6px;border-radius:50%;background:#C9C2AC;}
+  .pd-btn.done .dot{background:var(--good);}
+  .pd-btn.active{border-color:var(--accent);box-shadow:0 0 0 2px rgba(226,97,28,0.18);}
+  .pd-btn:hover{border-color:var(--accent-2);}
+  .pd-btn .val{font-size:10.5px;color:var(--ink-soft);}
+
+  .workbench{padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0;}
+  .workbench__head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;}
+  .seg-label{font-family:var(--display);font-weight:600;font-size:15px;}
+  .seg-actions{display:flex;gap:8px;}
+
+  .btn{
+    border:1px solid var(--ink);background:var(--panel-2);color:var(--ink);
+    border-radius:7px;padding:7px 12px;font-size:12.5px;font-weight:600;
+    font-family:var(--body);transition:background .12s, color .12s;
+  }
+  .btn:hover{background:var(--ink);color:var(--panel-2);}
+  .btn--upload{background:var(--accent);border-color:var(--accent-ink);color:#fff;}
+  .btn--upload:hover{background:var(--accent-ink);}
+  .btn--upload.is-locked{opacity:.5;pointer-events:none;}
+  .btn--save{background:var(--ink);color:#fff;}
+  .btn--ghost{background:transparent;border-color:var(--line-strong);color:var(--ink-soft);}
+  .btn[disabled]{opacity:.45;cursor:not-allowed;}
+
+  .ruler{
+    height:22px;border-radius:6px;background:
+      repeating-linear-gradient(90deg, var(--ink) 0 1px, transparent 1px 10%);
+    background-color:var(--panel);border:1px solid var(--line);
+    display:flex;font-family:var(--mono);font-size:9.5px;color:var(--ink-soft);
+    align-items:flex-end;padding:0 2px 2px;justify-content:space-between;
+  }
+
+  .stage{
+    position:relative;background:repeating-conic-gradient(#dedacd 0% 25%, #e6e2d4 0% 50%) 0 0/18px 18px;
+    border:1px dashed var(--line-strong);border-radius:8px;min-height:260px;
+    display:flex;align-items:center;justify-content:center;overflow:hidden;
+  }
+  .stage canvas{position:absolute;top:0;left:0;width:100%;height:100%;display:block;touch-action:none;}
+  .stage__empty{
+    position:relative;z-index:2;text-align:center;color:var(--ink-soft);font-size:13px;
+    max-width:320px;padding:22px;font-family:var(--body);
+  }
+
+  .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:var(--panel);
+    border:1px solid var(--line);border-radius:8px;padding:8px 10px;}
+  .tool-group{display:flex;gap:6px;align-items:center;padding-right:10px;border-right:1px solid var(--line);}
+  .tool-group:last-child{border-right:none;}
+  .tool{border:1px solid var(--line-strong);background:var(--panel-2);border-radius:6px;padding:6px 10px;font-size:12px;font-weight:600;color:var(--ink);}
+  .tool.is-active{background:var(--ink);color:#fff;border-color:var(--ink);}
+  .tool--accent{background:var(--accent-2);border-color:#9c7322;color:#3a2a08;}
+  .tool--accent:hover{background:#b3873a;}
+  .range-label{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-soft);font-family:var(--mono);}
+  .range-label input[type=range]{width:90px;}
+
+  .readout{display:flex;align-items:center;gap:18px;flex-wrap:wrap;background:var(--panel);
+    border:1px solid var(--line);border-radius:8px;padding:10px 14px;}
+  .readout__metric{display:flex;flex-direction:column;gap:2px;}
+  .readout__metric span{font-size:10.5px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.05em;font-family:var(--mono);}
+  .readout__metric strong{font-family:var(--mono);font-size:17px;}
+  .readout__metric--accent strong{color:var(--accent-ink);}
+  .readout .status{font-family:var(--mono);font-size:11px;color:var(--ink-soft);margin-left:auto;}
+  .readout .status.dirty{color:var(--bad);}
+  .readout .status.saved{color:var(--good);}
+
+  .hint{font-size:12px;color:var(--ink-soft);background:var(--panel);border:1px dashed var(--line-strong);
+    border-radius:8px;padding:9px 12px;}
+  .hint b{color:var(--ink);}
+
+  .results-panel{padding:14px;display:flex;flex-direction:column;gap:12px;position:sticky;top:18px;
+    max-height:calc(100vh - 36px);overflow:auto;}
+  .results-panel h2{font-family:var(--display);font-size:14.5px;margin:2px 0 0;display:flex;justify-content:space-between;align-items:baseline;}
+  .results-panel h2 span{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);font-weight:400;}
+
+  .grid-stamp{display:grid;grid-template-columns:repeat(10,1fr);gap:2px;background:var(--ink);
+    padding:2px;border-radius:6px;}
+  .gcell{
+    aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+    font-family:var(--mono);font-size:9px;color:#fff;text-shadow:0 1px 1px rgba(0,0,0,0.35);
+    border-radius:2px;background:#cfc8b3;cursor:pointer;position:relative;
+  }
+  .gcell.empty{color:#7a7866;background:repeating-linear-gradient(45deg,#dedacc 0 4px,#e7e3d6 4px 8px);}
+  .grid-axis{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9.5px;color:var(--ink-soft);padding:0 1px;}
+
+  .legend{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;color:var(--ink-soft);}
+  .legend .sw{width:14px;height:8px;border-radius:2px;display:inline-block;}
+
+  .chart-card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px;}
+
+  .summary{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .sum-tile{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:9px 10px;}
+  .sum-tile span{display:block;font-family:var(--mono);font-size:10px;color:var(--ink-soft);text-transform:uppercase;}
+  .sum-tile strong{font-family:var(--display);font-size:18px;}
+
+  .panel-actions{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:10px;}
+  .panel-actions .row{display:flex;gap:8px;align-items:center;}
+  .panel-actions input[type=number]{width:64px;border:1px solid var(--line-strong);border-radius:6px;padding:5px 6px;font-family:var(--mono);font-size:12px;}
+
+  /* Storage warning banner */
+  .storage-warn{
+    background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:9px 14px;
+    font-size:12px;color:#6c4a00;display:none;margin-bottom:8px;
+  }
+  .storage-warn.show{display:block;}
+
+  dialog#codeModal{border:none;border-radius:10px;padding:0;width:min(760px,92vw);max-height:80vh;}
+  dialog#codeModal::backdrop{background:rgba(20,18,12,0.55);}
+  .modal-head{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--panel);}
+  .modal-head h3{font-family:var(--display);font-size:14px;margin:0;}
+  .modal-head button{border:none;background:none;font-size:16px;color:var(--ink-soft);}
+  #codeOutput{margin:0;padding:14px 16px;font-family:var(--mono);font-size:11.5px;line-height:1.6;
+    overflow:auto;max-height:60vh;white-space:pre;background:#1d1e19;color:#e9e5d6;}
+  .modal-foot{padding:10px 16px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;background:var(--panel);}
+
+  .toast{
+    position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--ink);color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;
+    opacity:0;transition:opacity .2s, transform .2s;pointer-events:none;z-index:50;font-family:var(--body);
+    box-shadow:0 10px 30px -10px rgba(0,0,0,0.4);
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="titleblock">
+    <div class="titleblock__left">
+      <span class="eyebrow">Môn học ITS · Bài tập nhóm 5</span>
+      <h1>Trạm khảo sát tỉ lệ % diện tích trám vá — mặt đường BTXM</h1>
+    </div>
+    <div class="titleblock__stamp">
+      <div class="stamp-row"><span>Quy mô</span><strong>10 đoạn × 500m</strong></div>
+      <div class="stamp-row"><span>Số liệu</span><strong>100 phân đoạn</strong></div>
+    </div>
+  </header>
+
+  <div id="storageWarn" class="storage-warn">
+    ⚠️ Trình duyệt không hỗ trợ lưu trữ cục bộ (localStorage). Dữ liệu sẽ không được lưu giữa các lần tải lại trang.
+    Hãy thử mở file này trong trình duyệt Chrome/Firefox/Edge thông thường (không phải chế độ ẩn danh).
+  </div>
+
+  <div class="layout">
+
+    <!-- LEFT: segment navigator -->
+    <aside class="panel-card nav-panel" id="navPanel">
+      <h2>Danh sách đoạn / phân đoạn</h2>
+      <div id="navList"></div>
+    </aside>
+
+    <!-- CENTER: workbench -->
+    <main class="panel-card workbench">
+      <div class="workbench__head">
+        <div class="seg-label" id="segLabel">Chọn một phân đoạn ở bên trái để bắt đầu</div>
+        <div class="seg-actions">
+          <label class="btn btn--upload is-locked" id="uploadLabel">⤒ Tải ảnh khung hình
+            <input type="file" id="fileInput" accept="image/*" hidden>
+          </label>
+          <button class="btn btn--ghost" id="resetSegBtn">Làm lại phân đoạn</button>
+        </div>
+      </div>
+
+      <div class="hint" id="hintBox">
+        <b>Quy trình 4 bước:</b> ① Chọn phân đoạn (50m) ở danh sách bên trái → ② Tải khung hình BTXM của phân đoạn đó →
+        ③ Khoanh đường viền mặt đường (ROI) rồi bấm <i>"Đóng ROI"</i> → ④ Đánh dấu tay vùng đã trám vá hoặc bấm
+        <i>"Tự động phát hiện"</i> rồi chỉnh lại bằng cọ, sau đó <i>"Lưu kết quả"</i>.
+      </div>
+
+      <div class="ruler" id="ruler">
+        <span>0m</span><span>5</span><span>10</span><span>15</span><span>20</span><span>25</span>
+        <span>30</span><span>35</span><span>40</span><span>45</span><span>50m</span>
+      </div>
+
+      <div class="stage" id="stage">
+        <div class="stage__empty" id="stageEmpty">Chưa có ảnh.<br>Tải khung hình từ clip mặt đường BTXM cho phân đoạn này.</div>
+        <canvas id="imgCanvas"></canvas>
+        <canvas id="overlayCanvas"></canvas>
+      </div>
+
+      <div class="toolbar">
+        <div class="tool-group">
+          <button class="tool" data-mode="roi" id="toolRoi">① Khoanh ROI</button>
+          <button class="tool" id="closeRoiBtn">Đóng ROI</button>
+          <button class="tool" id="clearRoiBtn">Xoá ROI</button>
+        </div>
+        <div class="tool-group">
+          <button class="tool" data-mode="brush" id="toolBrush">② Đánh dấu vết vá</button>
+          <button class="tool" data-mode="erase" id="toolErase">Tẩy</button>
+          <label class="range-label">Cỡ cọ <input type="range" id="brushSize" min="4" max="60" value="18"></label>
+          <button class="tool" id="clearMaskBtn">Xoá hết đánh dấu</button>
+        </div>
+        <div class="tool-group">
+          <label class="range-label">Độ nhạy <input type="range" id="sensitivity" min="5" max="95" value="45"></label>
+          <button class="tool tool--accent" id="autoDetectBtn">⚡ Tự động phát hiện</button>
+        </div>
+      </div>
+
+      <div class="readout">
+        <div class="readout__metric"><span>Diện tích ROI</span><strong id="roiAreaOut">—</strong></div>
+        <div class="readout__metric"><span>Diện tích trám vá</span><strong id="patchAreaOut">—</strong></div>
+        <div class="readout__metric readout__metric--accent"><span>Tỉ lệ % trám vá</span><strong id="percentOut">—</strong></div>
+        <div class="readout__metric"><span>Quy đổi ước tính</span><strong id="m2Out" style="font-size:12.5px;color:var(--ink-soft);">—</strong></div>
+        <span class="status" id="statusOut">chưa có dữ liệu</span>
+        <button class="btn btn--save" id="saveBtn" disabled>💾 Lưu kết quả phân đoạn</button>
+      </div>
+    </main>
+
+    <!-- RIGHT: results -->
+    <section class="panel-card results-panel">
+      <h2>Bảng kết quả 10×10 <span id="completionCount">0/100</span></h2>
+
+      <div>
+        <div class="grid-axis"><span>Phân đoạn →</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
+        <div class="grid-stamp" id="resultGrid"></div>
+      </div>
+
+      <div class="legend">
+        <span>0%</span><span class="sw" style="background:rgb(79,121,66)"></span>
+        <span class="sw" style="background:rgb(217,162,59)"></span>
+        <span class="sw" style="background:rgb(180,59,47)"></span><span>≥20%</span>
+        <span style="margin-left:auto;">ô gạch chéo = chưa đo</span>
+      </div>
+
+      <div class="chart-card">
+        <canvas id="barChart" height="170"></canvas>
+      </div>
+
+      <div class="summary" id="summaryStats"></div>
+
+      <div class="panel-actions">
+        <div class="row">
+          <label class="range-label">Rộng mặt đường mặc định (m)
+            <input type="number" id="roadWidth" value="3.5" min="1" max="12" step="0.1">
+          </label>
+        </div>
+        <div class="row">
+          <button class="btn" id="exportBtn" style="flex:1;">⬇ Xuất CSV (100 số liệu)</button>
+          <button class="btn" id="codeBtn" style="flex:1;">⌥ Xem mã thuật toán</button>
+        </div>
+        <button class="btn btn--ghost" id="resetAllBtn">Đặt lại toàn bộ dữ liệu đã lưu</button>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<dialog id="codeModal">
+  <div class="modal-head">
+    <h3>Đoạn code phát hiện &amp; tính tỉ lệ % diện tích trám vá (JavaScript)</h3>
+    <button id="closeCodeModal">✕</button>
+  </div>
+  <pre id="codeOutput"></pre>
+  <div class="modal-foot">
+    <button class="btn" id="copyCodeBtn">Sao chép mã</button>
+  </div>
+</dialog>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+/* =========================================================================
+   TRẠM KHẢO SÁT TRÁM VÁ MẶT ĐƯỜNG BTXM — Nhóm 5
+   FIX: Thay window.storage bằng localStorage (hoạt động trong trình duyệt thực)
+   ========================================================================= */
+
+/* -------------------------------------------------------------------------
+   LƯU TRỮ — dùng localStorage thay vì window.storage (API chỉ có trong Claude)
+   Vì ảnh base64 khá lớn, ta nén bằng cách lưu riêng từng phân đoạn với key
+   "btxm_nhom5_segment_{d}-{p}" để tránh vượt giới hạn 5MB/key.
+   ------------------------------------------------------------------------- */
+const STORAGE_PREFIX = 'btxm_nhom5_segment_';
+let storageAvailable = false;
+
+function checkStorage() {
+  try {
+    const testKey = '__storage_test__';
+    localStorage.setItem(testKey, '1');
+    localStorage.removeItem(testKey);
+    storageAvailable = true;
+  } catch (e) {
+    storageAvailable = false;
+    document.getElementById('storageWarn').classList.add('show');
+  }
+}
+
+function storageSave(key, value) {
+  if (!storageAvailable) return false;
+  try {
+    localStorage.setItem(STORAGE_PREFIX + key, value);
+    return true;
+  } catch (e) {
+    // Vượt quota (thường ~5-10MB tổng) — thông báo và gợi ý xoá dữ liệu cũ
+    if (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
+      return 'quota';
+    }
+    console.error('localStorage save error:', e);
+    return false;
+  }
+}
+
+function storageLoad(key) {
+  if (!storageAvailable) return null;
+  try {
+    return localStorage.getItem(STORAGE_PREFIX + key);
+  } catch (e) {
+    return null;
+  }
+}
+
+function storageDelete(key) {
+  if (!storageAvailable) return;
+  try { localStorage.removeItem(STORAGE_PREFIX + key); } catch (e) {}
+}
+
+function storageListAllKeys() {
+  if (!storageAvailable) return [];
+  const keys = [];
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith(STORAGE_PREFIX)) keys.push(k.slice(STORAGE_PREFIX.length));
+    }
+  } catch (e) {}
+  return keys;
+}
+
+/* -------------------------------------------------------------------------
+   PHẦN 1 — THUẬT TOÁN PHÁT HIỆN
+   ------------------------------------------------------------------------- */
+function medianColor(pixels, roiMask, w, h) {
+  const histR = new Uint32Array(256), histG = new Uint32Array(256), histB = new Uint32Array(256);
+  let total = 0;
+  for (let i = 0, px = 0; px < w * h; px++, i += 4) {
+    if (!roiMask[px]) continue;
+    histR[pixels[i]]++; histG[pixels[i + 1]]++; histB[pixels[i + 2]]++;
+    total++;
+  }
+  function median(hist) {
+    const half = total / 2; let acc = 0;
+    for (let v = 0; v < 256; v++) { acc += hist[v]; if (acc >= half) return v; }
+    return 128;
+  }
+  return [median(histR), median(histG), median(histB)];
+}
+
+function detectPatchPixels(pixels, roiMask, w, h, refColor, threshold) {
+  const candidate = new Uint8Array(w * h);
+  const [rr, rg, rb] = refColor;
+  for (let i = 0, px = 0; px < w * h; px++, i += 4) {
+    if (!roiMask[px]) continue;
+    const dr = pixels[i] - rr, dg = pixels[i + 1] - rg, db = pixels[i + 2] - rb;
+    const dist = Math.sqrt(dr * dr + dg * dg + db * db);
+    if (dist > threshold) candidate[px] = 1;
+  }
+  return candidate;
+}
+
+function filterSmallComponents(candidate, w, h, minSize) {
+  const visited = new Uint8Array(w * h);
+  const result = new Uint8Array(w * h);
+  for (let start = 0; start < w * h; start++) {
+    if (candidate[start] !== 1 || visited[start]) continue;
+    const comp = [start];
+    visited[start] = 1;
+    const stack = [start];
+    while (stack.length) {
+      const idx = stack.pop();
+      const x = idx % w;
+      const neigh = [idx - 1, idx + 1, idx - w, idx + w];
+      for (const n of neigh) {
+        if (n < 0 || n >= w * h) continue;
+        const nx = n % w;
+        if (Math.abs(nx - x) > 1) continue;
+        if (candidate[n] === 1 && !visited[n]) { visited[n] = 1; stack.push(n); comp.push(n); }
+      }
+    }
+    if (comp.length >= minSize) for (const idx of comp) result[idx] = 1;
+  }
+  return result;
+}
+
+function computePatchPercent(roiMask, maskAlpha, w, h) {
+  let roiCount = 0, patchCount = 0;
+  for (let i = 0, px = 0; px < w * h; px++, i += 4) {
+    if (roiMask[px]) {
+      roiCount++;
+      if (maskAlpha[i + 3] > 40) patchCount++;
+    }
+  }
+  return {
+    roiAreaPx: roiCount,
+    patchAreaPx: patchCount,
+    percent: roiCount ? (patchCount / roiCount) * 100 : 0
+  };
+}
+
+/* -------------------------------------------------------------------------
+   PHẦN 2 — TRẠNG THÁI ỨNG DỤNG & DOM
+   ------------------------------------------------------------------------- */
+const state = { segments: new Map() };
+let currentDoan = null, currentPhanDoan = null;
+let imageLoaded = false, dirty = false;
+let mode = 'roi';
+let roiPoints = [], roiClosed = false, roiMaskBitmap = null;
+let painting = false, lastPos = null;
+let roiAreaPx = 0, patchAreaPx = 0, percent = 0;
+let imgCanvas, overlayCanvas, maskCanvas, ictx, octx, mctx;
+let barChart = null;
+
+const $ = (id) => document.getElementById(id);
+
+function toast(msg, duration = 2600) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), duration);
+}
+
+/* -------------------------------------------------------------------------
+   PHẦN 3 — CANVAS & TIỆN ÍCH HÌNH HỌC
+   ------------------------------------------------------------------------- */
+function setupCanvases(w, h) {
+  imgCanvas.width = w; imgCanvas.height = h;
+  overlayCanvas.width = w; overlayCanvas.height = h;
+  if (!maskCanvas) { maskCanvas = document.createElement('canvas'); mctx = maskCanvas.getContext('2d'); }
+  maskCanvas.width = w; maskCanvas.height = h;
+  const stageEl = $('stage');
+  if (stageEl) stageEl.style.aspectRatio = w + ' / ' + h;
+}
+
+function getPos(evt) {
+  const rect = overlayCanvas.getBoundingClientRect();
+  const scaleX = overlayCanvas.width / rect.width;
+  const scaleY = overlayCanvas.height / rect.height;
+  const src = evt.touches ? evt.touches[0] : evt;
+  return { x: (src.clientX - rect.left) * scaleX, y: (src.clientY - rect.top) * scaleY };
+}
+
+function roiPath() {
+  const p = new Path2D();
+  if (roiPoints.length) {
+    p.moveTo(roiPoints[0].x, roiPoints[0].y);
+    for (let i = 1; i < roiPoints.length; i++) p.lineTo(roiPoints[i].x, roiPoints[i].y);
+    if (roiClosed) p.closePath();
+  }
+  return p;
+}
+
+function buildRoiMaskBitmap() {
+  const w = overlayCanvas.width, h = overlayCanvas.height;
+  const tmp = document.createElement('canvas'); tmp.width = w; tmp.height = h;
+  const tctx = tmp.getContext('2d');
+  tctx.fillStyle = '#fff';
+  tctx.fill(roiPath());
+  const data = tctx.getImageData(0, 0, w, h).data;
+  const bitmap = new Uint8Array(w * h);
+  for (let i = 0, px = 0; px < w * h; px++, i += 4) bitmap[px] = data[i + 3] > 0 ? 1 : 0;
+  return bitmap;
+}
+
+function tintMask(srcCanvas, color) {
+  const t = document.createElement('canvas');
+  t.width = srcCanvas.width; t.height = srcCanvas.height;
+  const tctx = t.getContext('2d');
+  tctx.drawImage(srcCanvas, 0, 0);
+  tctx.globalCompositeOperation = 'source-in';
+  tctx.fillStyle = color;
+  tctx.fillRect(0, 0, t.width, t.height);
+  return t;
+}
+
+function renderOverlay() {
+  octx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+  if (roiClosed) {
+    octx.save();
+    octx.clip(roiPath());
+    const tinted = tintMask(maskCanvas, 'rgba(226,97,28,0.95)');
+    octx.globalAlpha = 0.55;
+    octx.drawImage(tinted, 0, 0);
+    octx.globalAlpha = 1;
+    octx.restore();
+  }
+  if (roiPoints.length) {
+    octx.save();
+    octx.strokeStyle = '#C99A3A';
+    octx.lineWidth = 2;
+    octx.setLineDash(roiClosed ? [] : [6, 4]);
+    octx.beginPath();
+    octx.moveTo(roiPoints[0].x, roiPoints[0].y);
+    for (let i = 1; i < roiPoints.length; i++) octx.lineTo(roiPoints[i].x, roiPoints[i].y);
+    if (roiClosed) octx.closePath();
+    octx.stroke();
+    if (roiClosed) { octx.fillStyle = 'rgba(201,154,58,0.07)'; octx.fill(roiPath()); }
+    roiPoints.forEach((p) => {
+      octx.beginPath(); octx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+      octx.fillStyle = '#C99A3A'; octx.fill();
+      octx.strokeStyle = '#23241F'; octx.lineWidth = 1; octx.stroke();
+    });
+    octx.restore();
+  }
+}
+
+function paintAt(x, y, erase) {
+  mctx.globalCompositeOperation = erase ? 'destination-out' : 'source-over';
+  mctx.beginPath();
+  mctx.arc(x, y, parseInt($('brushSize').value, 10) / 2, 0, Math.PI * 2);
+  mctx.fillStyle = '#ffffff';
+  mctx.fill();
+  mctx.globalCompositeOperation = 'source-over';
+}
+
+function recalc() {
+  if (!roiClosed) { roiAreaPx = patchAreaPx = percent = 0; updateReadout(); return; }
+  const w = overlayCanvas.width, h = overlayCanvas.height;
+  const maskData = mctx.getImageData(0, 0, w, h).data;
+  const r = computePatchPercent(roiMaskBitmap, maskData, w, h);
+  roiAreaPx = r.roiAreaPx; patchAreaPx = r.patchAreaPx; percent = r.percent;
+  updateReadout();
+}
+
+function updateReadout() {
+  $('roiAreaOut').textContent = roiClosed ? roiAreaPx.toLocaleString('vi-VN') + ' px' : '—';
+  $('patchAreaOut').textContent = roiClosed ? patchAreaPx.toLocaleString('vi-VN') + ' px' : '—';
+  $('percentOut').textContent = roiClosed ? percent.toFixed(2) + '%' : '—';
+  const width = parseFloat($('roadWidth').value) || 3.5;
+  if (roiClosed) {
+    const areaM2 = width * 50;
+    const patchM2 = (percent / 100) * areaM2;
+    $('m2Out').textContent = `≈ ${patchM2.toFixed(1)} / ${areaM2.toFixed(1)} m²`;
+  } else { $('m2Out').textContent = '—'; }
+  const statusEl = $('statusOut');
+  if (!imageLoaded) { statusEl.textContent = 'chưa có dữ liệu'; statusEl.className = 'status'; }
+  else if (dirty) { statusEl.textContent = '● chưa lưu'; statusEl.className = 'status dirty'; }
+  else { statusEl.textContent = '✓ đã lưu'; statusEl.className = 'status saved'; }
+  $('saveBtn').disabled = !(imageLoaded && roiClosed);
+}
+
+function setActiveTool(m) {
+  mode = m;
+  document.querySelectorAll('.tool[data-mode]').forEach((b) => b.classList.toggle('is-active', b.dataset.mode === m));
+}
+
+/* -------------------------------------------------------------------------
+   PHẦN 4 — TỰ ĐỘNG PHÁT HIỆN
+   ------------------------------------------------------------------------- */
+function runAutoDetect() {
+  if (!imageLoaded) { toast('Hãy tải ảnh khung hình trước'); return; }
+  if (!roiClosed) { toast('Hãy khoanh và "Đóng ROI" trước khi phát hiện'); return; }
+  if (patchAreaPx > 0 && !confirm('Tự động phát hiện sẽ thay thế các đánh dấu hiện tại. Tiếp tục?')) return;
+
+  const w = overlayCanvas.width, h = overlayCanvas.height;
+  const imgData = ictx.getImageData(0, 0, w, h).data;
+  const ref = medianColor(imgData, roiMaskBitmap, w, h);
+  const sensitivity = parseInt($('sensitivity').value, 10);
+  const threshold = 150 - sensitivity * 1.1;
+  const candidate = detectPatchPixels(imgData, roiMaskBitmap, w, h, ref, threshold);
+  const minSize = Math.max(20, Math.round((w * h) / 15000));
+  const cleaned = filterSmallComponents(candidate, w, h, minSize);
+
+  const maskImg = mctx.createImageData(w, h);
+  for (let i = 0, px = 0; px < w * h; px++, i += 4) {
+    if (cleaned[px]) { maskImg.data[i] = 255; maskImg.data[i + 1] = 255; maskImg.data[i + 2] = 255; maskImg.data[i + 3] = 255; }
+  }
+  mctx.putImageData(maskImg, 0, 0);
+  recalc(); renderOverlay(); dirty = true; updateReadout();
+  setActiveTool('brush');
+  toast('Đã phát hiện tự động — dùng cọ để chỉnh tay nếu cần');
+}
+
+/* -------------------------------------------------------------------------
+   PHẦN 5 — TƯƠNG TÁC CHUỘT / CHẠM
+   ------------------------------------------------------------------------- */
+function bindStageEvents() {
+  overlayCanvas.addEventListener('pointerdown', (e) => {
+    if (!imageLoaded) return;
+    const pos = getPos(e);
+    if (mode === 'roi') {
+      if (roiClosed) { toast('ROI đã đóng. Bấm "Xoá ROI" để vẽ lại.'); return; }
+      roiPoints.push(pos); dirty = true; renderOverlay();
+    } else if (mode === 'brush' || mode === 'erase') {
+      if (!roiClosed) { toast('Hãy khoanh và "Đóng ROI" trước khi đánh dấu'); return; }
+      painting = true; lastPos = pos;
+      paintAt(pos.x, pos.y, mode === 'erase');
+      renderOverlay();
+    }
+  });
+  overlayCanvas.addEventListener('pointermove', (e) => {
+    if (!painting) return;
+    const pos = getPos(e);
+    const brush = parseInt($('brushSize').value, 10);
+    const dist = Math.hypot(pos.x - lastPos.x, pos.y - lastPos.y);
+    const steps = Math.max(1, Math.ceil(dist / Math.max(2, brush / 3)));
+    for (let i = 1; i <= steps; i++) {
+      const t = i / steps;
+      paintAt(lastPos.x + (pos.x - lastPos.x) * t, lastPos.y + (pos.y - lastPos.y) * t, mode === 'erase');
+    }
+    lastPos = pos;
+    renderOverlay();
+  });
+  window.addEventListener('pointerup', () => {
+    if (painting) { painting = false; dirty = true; recalc(); }
+  });
+}
+
+/* -------------------------------------------------------------------------
+   PHẦN 6 — TẢI ẢNH / KHÔI PHỤC / LÀM LẠI
+   ------------------------------------------------------------------------- */
+function hideStageEmpty() { $('stageEmpty').style.display = 'none'; }
+function showStageEmpty() { $('stageEmpty').style.display = 'block'; }
+
+function resetWorkbenchUI() {
+  imageLoaded = false; dirty = false; roiPoints = []; roiClosed = false; roiMaskBitmap = null;
+  roiAreaPx = patchAreaPx = percent = 0;
+  if (ictx) ictx.clearRect(0, 0, imgCanvas.width, imgCanvas.height);
+  if (mctx) mctx.clearRect(0, 0, maskCanvas ? maskCanvas.width : 0, maskCanvas ? maskCanvas.height : 0);
+  if (octx) octx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+  showStageEmpty();
+  updateReadout();
+  setActiveTool('roi');
+}
+
+function loadImageAsync(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+
+async function restoreSegment(rec) {
+  try {
+    setupCanvases(rec.width, rec.height);
+    const [photo, maskImg] = await Promise.all([loadImageAsync(rec.imageDataUrl), loadImageAsync(rec.maskDataUrl)]);
+    ictx.drawImage(photo, 0, 0, rec.width, rec.height);
+    mctx.clearRect(0, 0, rec.width, rec.height);
+    mctx.drawImage(maskImg, 0, 0, rec.width, rec.height);
+    roiPoints = rec.roiPoints.map((p) => ({ x: p.x, y: p.y }));
+    roiClosed = true;
+    roiMaskBitmap = buildRoiMaskBitmap();
+    imageLoaded = true; dirty = false;
+    hideStageEmpty();
+    recalc(); renderOverlay(); updateReadout();
+    setActiveTool('brush');
+  } catch (err) {
+    console.error('Lỗi khôi phục phân đoạn:', err);
+    toast('Không thể khôi phục dữ liệu đã lưu cho phân đoạn này');
+    resetWorkbenchUI();
+  }
+}
+
+function handleFileSelect(e) {
+  const file = e.target.files[0];
+  if (!file || !currentDoan) return;
+  if (dirty && !confirm('Phân đoạn hiện tại có thay đổi chưa lưu. Tải ảnh mới sẽ thay thế nội dung đang vẽ. Tiếp tục?')) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      const maxW = 960, maxH = 640;
+      const scale = Math.min(maxW / img.width, maxH / img.height, 1);
+      const w = Math.round(img.width * scale), h = Math.round(img.height * scale);
+      setupCanvases(w, h);
+      ictx.drawImage(img, 0, 0, w, h);
+      roiPoints = []; roiClosed = false; roiMaskBitmap = null;
+      imageLoaded = true; dirty = true;
+      hideStageEmpty(); renderOverlay(); updateReadout();
+      setActiveTool('roi');
+      toast('Đã tải ảnh — khoanh đường viền mặt đường (ROI) rồi bấm "Đóng ROI"');
+    };
+    img.onerror = () => toast('Không thể đọc file ảnh. Vui lòng chọn file ảnh hợp lệ (JPG/PNG).');
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+}
+
+/* -------------------------------------------------------------------------
+   PHẦN 7 — ĐIỀU HƯỚNG PHÂN ĐOẠN (10 đoạn × 10 phân đoạn)
+   ------------------------------------------------------------------------- */
+function buildNav() {
+  const navList = $('navList');
+  navList.innerHTML = '';
+  for (let d = 1; d <= 10; d++) {
+    const det = document.createElement('details');
+    det.className = 'doan';
+    if (d === 1) det.open = true;
+    const summary = document.createElement('summary');
+    summary.innerHTML = `<span>Đoạn ${d} · 500m</span><span class="doan-badge" id="badge-doan-${d}">0/10</span>`;
+    det.appendChild(summary);
+    const grid = document.createElement('div');
+    grid.className = 'phandoan-grid';
+    for (let p = 1; p <= 10; p++) {
+      const btn = document.createElement('button');
+      btn.className = 'pd-btn';
+      btn.id = `pd-${d}-${p}`;
+      btn.innerHTML = `<span class="dot"></span><span>PĐ ${p}</span><span class="val">—</span>`;
+      btn.addEventListener('click', () => selectSegment(d, p));
+      grid.appendChild(btn);
+    }
+    det.appendChild(grid);
+    navList.appendChild(det);
+  }
+}
+
+function highlightActiveNavButton(d, p) {
+  document.querySelectorAll('.pd-btn').forEach((b) => b.classList.remove('active'));
+  const el = $(`pd-${d}-${p}`);
+  if (el) el.classList.add('active');
+}
+
+function refreshNavBadge(d, p) {
+  const key = `${d}-${p}`;
+  const rec = state.segments.get(key);
+  const btn = $(`pd-${d}-${p}`);
+  if (btn) {
+    btn.classList.toggle('done', !!rec);
+    btn.querySelector('.val').textContent = rec ? rec.percent.toFixed(1) + '%' : '—';
+  }
+  let count = 0;
+  for (let p2 = 1; p2 <= 10; p2++) if (state.segments.get(`${d}-${p2}`)) count++;
+  const badge = $(`badge-doan-${d}`);
+  if (badge) badge.textContent = `${count}/10`;
+}
+
+function refreshAllBadges() {
+  for (let d = 1; d <= 10; d++) for (let p = 1; p <= 10; p++) refreshNavBadge(d, p);
+}
+
+function selectSegment(d, p) {
+  if (dirty && !confirm('Phân đoạn hiện tại có thay đổi chưa lưu. Chuyển phân đoạn sẽ mất các thay đổi này. Tiếp tục?')) return;
+  currentDoan = d; currentPhanDoan = p;
+  $('uploadLabel').classList.remove('is-locked');
+  $('segLabel').textContent = `Đoạn ${d} · Phân đoạn ${p} (mã ${d}_BTXM_${p}) — đoạn dài 50m`;
+  highlightActiveNavButton(d, p);
+  resetWorkbenchUI();
+  const rec = state.segments.get(`${d}-${p}`);
+  if (rec) restoreSegment(rec);
+}
+
+/* -------------------------------------------------------------------------
+   PHẦN 8 — LƯU / TẢI DỮ LIỆU qua localStorage
+   ------------------------------------------------------------------------- */
+function saveCurrentSegment() {
+  if (!currentDoan) return;
+  if (!imageLoaded) { toast('Chưa có ảnh để lưu'); return; }
+  if (!roiClosed) { toast('Hãy khoanh và "Đóng ROI" trước khi lưu'); return; }
+  recalc();
+  const w = overlayCanvas.width, h = overlayCanvas.height;
+
+  // Nén ảnh JPEG chất lượng 0.65 để giảm kích thước lưu trữ
+  const record = {
+    width: w, height: h,
+    roiPoints: roiPoints.map((pt) => ({ x: pt.x, y: pt.y })),
+    imageDataUrl: imgCanvas.toDataURL('image/jpeg', 0.65),
+    maskDataUrl: maskCanvas.toDataURL('image/png'),
+    roiAreaPx, patchAreaPx, percent,
+    savedAt: Date.now()
+  };
+
+  const key = `${currentDoan}-${currentPhanDoan}`;
+  let serialized;
+  try {
+    serialized = JSON.stringify(record);
+  } catch (e) {
+    toast('Lỗi khi chuẩn bị dữ liệu lưu'); return;
+  }
+
+  const result = storageSave(key, serialized);
+  if (result === 'quota') {
+    // Lưu vào bộ nhớ phiên vẫn được, chỉ cảnh báo không ghi được đĩa
+    toast('⚠️ Bộ nhớ đầy! Kết quả đã lưu cho phiên này nhưng có thể mất khi tải lại trang. Hãy xuất CSV.', 4000);
+    state.segments.set(key, record);
+  } else if (!result) {
+    toast('Lỗi lưu dữ liệu. Thử xuất CSV để backup.'); return;
+  } else {
+    state.segments.set(key, record);
+    dirty = false; updateReadout();
+    toast(`✓ Đã lưu Đoạn ${currentDoan} – Phân đoạn ${currentPhanDoan}: ${percent.toFixed(2)}%`);
+  }
+
+  dirty = false; updateReadout();
+  refreshNavBadge(currentDoan, currentPhanDoan);
+  refreshResultsTable(); refreshChart(); refreshSummary();
+}
+
+function loadAllSegmentsFromStorage() {
+  const keys = storageListAllKeys();
+  for (const key of keys) {
+    try {
+      const raw = storageLoad(key);
+      if (raw) state.segments.set(key, JSON.parse(raw));
+    } catch (e) {
+      console.warn('Không thể đọc dữ liệu cho key:', key, e);
+    }
+  }
+  refreshAllBadges();
+}
+
+async function resetAllData() {
+  if (!confirm('Xoá toàn bộ 100 kết quả đã lưu? Hành động này không thể hoàn tác.')) return;
+  const keys = storageListAllKeys();
+  for (const key of keys) storageDelete(key);
+  state.segments.clear();
+  refreshAllBadges(); refreshResultsTable(); refreshChart(); refreshSummary();
+  resetWorkbenchUI();
+  $('segLabel').textContent = 'Chọn một phân đoạn ở bên trái để bắt đầu';
+  $('uploadLabel').classList.add('is-locked');
+  currentDoan = null; currentPhanDoan = null;
+  toast('Đã đặt lại toàn bộ dữ liệu');
+}
+
+/* -------------------------------------------------------------------------
+   PHẦN 9 — BẢNG KẾT QUẢ / BIỂU ĐỒ / THỐNG KÊ / XUẤT CSV
+   ------------------------------------------------------------------------- */
+function colorForPercent(p) {
+  const t = Math.min(1, p / 20);
+  const green = [79, 121, 66], amber = [201, 154, 58], red = [168, 57, 46];
+  const lerp = (a, b, k) => a + (b - a) * k;
+  let c;
+  if (t < 0.5) { const k = t / 0.5; c = [0, 1, 2].map((i) => lerp(green[i], amber[i], k)); }
+  else { const k = (t - 0.5) / 0.5; c = [0, 1, 2].map((i) => lerp(amber[i], red[i], k)); }
+  return `rgb(${c.map((v) => Math.round(v)).join(',')})`;
+}
+
+function refreshResultsTable() {
+  const grid = $('resultGrid');
+  grid.innerHTML = '';
+  let completed = 0;
+  for (let d = 1; d <= 10; d++) {
+    for (let p = 1; p <= 10; p++) {
+      const rec = state.segments.get(`${d}-${p}`);
+      const cell = document.createElement('div');
+      if (rec) {
+        completed++;
+        cell.className = 'gcell';
+        cell.style.background = colorForPercent(rec.percent);
+        cell.textContent = rec.percent.toFixed(1);
+        cell.title = `Đoạn ${d} – Phân đoạn ${p}: ${rec.percent.toFixed(2)}%`;
+      } else {
+        cell.className = 'gcell empty';
+        cell.title = `Đoạn ${d} – Phân đoạn ${p}: chưa đo`;
+      }
+      cell.addEventListener('click', () => selectSegment(d, p));
+      grid.appendChild(cell);
+    }
+  }
+  $('completionCount').textContent = `${completed}/100`;
+}
+
+function refreshChart() {
+  const labels = [];
+  const data = [];
+  for (let d = 1; d <= 10; d++) {
+    let sum = 0, n = 0;
+    for (let p = 1; p <= 10; p++) {
+      const rec = state.segments.get(`${d}-${p}`);
+      if (rec) { sum += rec.percent; n++; }
+    }
+    labels.push('Đ' + d);
+    data.push(n ? +(sum / n).toFixed(2) : 0);
+  }
+  const ctx = $('barChart').getContext('2d');
+  if (barChart) { barChart.data.labels = labels; barChart.data.datasets[0].data = data; barChart.update(); return; }
+  barChart = new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets: [{ label: 'TB % trám vá theo đoạn', data, backgroundColor: '#E2611C', borderRadius: 4, maxBarThickness: 28 }] },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false }, title: { display: true, text: 'Tỉ lệ % trám vá trung bình theo từng đoạn (500m)', font: { size: 11.5 }, color: '#69675D' } },
+      scales: {
+        y: { beginAtZero: true, ticks: { callback: (v) => v + '%' }, grid: { color: '#E5E0D2' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+}
+
+function refreshSummary() {
+  const vals = [];
+  for (let d = 1; d <= 10; d++) for (let p = 1; p <= 10; p++) {
+    const rec = state.segments.get(`${d}-${p}`);
+    if (rec) vals.push(rec.percent);
+  }
+  const el = $('summaryStats');
+  if (!vals.length) { el.innerHTML = ''; return; }
+  const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
+  const max = Math.max(...vals);
+  const min = Math.min(...vals);
+  el.innerHTML = `
+    <div class="sum-tile"><span>Trung bình</span><strong>${avg.toFixed(2)}%</strong></div>
+    <div class="sum-tile"><span>Cao nhất</span><strong>${max.toFixed(2)}%</strong></div>
+    <div class="sum-tile"><span>Thấp nhất</span><strong>${min.toFixed(2)}%</strong></div>
+    <div class="sum-tile"><span>Đã đo</span><strong>${vals.length}/100</strong></div>
+  `;
+}
+
+function exportCSV() {
+  const BOM = '\uFEFF'; // BOM UTF-8 để Excel đọc tiếng Việt đúng
+  const rows = [['Doan', 'PhanDoan', 'MaPhanDoan', 'DienTichROI_px', 'DienTichTramVa_px', 'TiLe_PhanTram', 'ThoiGianLuu']];
+  for (let d = 1; d <= 10; d++) for (let p = 1; p <= 10; p++) {
+    const rec = state.segments.get(`${d}-${p}`);
+    const savedDate = rec ? new Date(rec.savedAt).toLocaleString('vi-VN') : '';
+    rows.push([
+      d, p, `${d}_BTXM_${p}`,
+      rec ? rec.roiAreaPx : '',
+      rec ? rec.patchAreaPx : '',
+      rec ? rec.percent.toFixed(4) : '',
+      savedDate
+    ]);
+  }
+  const csv = BOM + rows.map((r) => r.join(',')).join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'ket_qua_tram_va_BTXM_Nhom5.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('Đã xuất file CSV (100 số liệu)');
+}
+
+/* -------------------------------------------------------------------------
+   PHẦN 10 — MODAL MÃ THUẬT TOÁN
+   ------------------------------------------------------------------------- */
+function buildCodeText() {
+  return [
+    '// ===== Thuật toán phát hiện & tính tỉ lệ % diện tích trám vá — Nhóm 5 =====',
+    '// (Mã nguồn thật, trích trực tiếp từ ứng dụng đang chạy)',
+    '// Lưu trữ: localStorage với prefix "btxm_nhom5_segment_{đoạn}-{phân đoạn}"',
+    '',
+    medianColor.toString(),
+    '',
+    detectPatchPixels.toString(),
+    '',
+    filterSmallComponents.toString(),
+    '',
+    computePatchPercent.toString()
+  ].join('\n');
+}
+
+/* -------------------------------------------------------------------------
+   PHẦN 11 — GẮN SỰ KIỆN & KHỞI ĐỘNG
+   ------------------------------------------------------------------------- */
+function bindUI() {
+  $('fileInput').addEventListener('change', handleFileSelect);
+  $('uploadLabel').addEventListener('click', (e) => {
+    if (!currentDoan) {
+      e.preventDefault();
+      toast('Hãy chọn một phân đoạn (PĐ) ở danh sách bên trái trước khi tải ảnh');
+    }
+  });
+
+  $('toolRoi').addEventListener('click', () => {
+    if (roiClosed) { toast('ROI đã đóng. Bấm "Xoá ROI" để khoanh lại.'); return; }
+    setActiveTool('roi');
+  });
+  $('toolBrush').addEventListener('click', () => {
+    if (!roiClosed) { toast('Hãy "Đóng ROI" trước khi đánh dấu'); return; }
+    setActiveTool('brush');
+  });
+  $('toolErase').addEventListener('click', () => {
+    if (!roiClosed) { toast('Hãy "Đóng ROI" trước'); return; }
+    setActiveTool('erase');
+  });
+
+  $('closeRoiBtn').addEventListener('click', () => {
+    if (!imageLoaded) { toast('Chưa có ảnh'); return; }
+    if (roiPoints.length < 3) { toast('Cần ít nhất 3 điểm để khoanh ROI'); return; }
+    roiClosed = true;
+    roiMaskBitmap = buildRoiMaskBitmap();
+    recalc(); renderOverlay(); updateReadout();
+    setActiveTool('brush');
+    toast('Đã đóng ROI — sẵn sàng đánh dấu vết trám vá');
+  });
+  $('clearRoiBtn').addEventListener('click', () => {
+    if (!imageLoaded) return;
+    roiPoints = []; roiClosed = false; roiMaskBitmap = null;
+    if (mctx) mctx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+    dirty = true;
+    recalc(); renderOverlay(); updateReadout();
+    setActiveTool('roi');
+  });
+  $('clearMaskBtn').addEventListener('click', () => {
+    if (!imageLoaded) return;
+    if (mctx) mctx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+    dirty = true;
+    recalc(); renderOverlay(); updateReadout();
+  });
+
+  $('autoDetectBtn').addEventListener('click', runAutoDetect);
+  $('saveBtn').addEventListener('click', saveCurrentSegment);
+  $('resetSegBtn').addEventListener('click', () => {
+    if (!currentDoan) return;
+    if (!confirm('Làm lại từ đầu cho phân đoạn này? (Thay đổi chưa lưu sẽ mất, dữ liệu đã lưu trước đó vẫn còn trừ khi bạn lưu lại)')) return;
+    resetWorkbenchUI();
+  });
+
+  $('roadWidth').addEventListener('input', updateReadout);
+  $('exportBtn').addEventListener('click', exportCSV);
+  $('resetAllBtn').addEventListener('click', resetAllData);
+
+  $('codeBtn').addEventListener('click', () => {
+    $('codeOutput').textContent = buildCodeText();
+    $('codeModal').showModal();
+  });
+  $('closeCodeModal').addEventListener('click', () => $('codeModal').close());
+  $('copyCodeBtn').addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText($('codeOutput').textContent); toast('Đã sao chép mã'); }
+    catch (e) { toast('Không thể tự sao chép — vui lòng bôi đen và copy bằng tay'); }
+  });
+}
+
+function init() {
+  checkStorage(); // Kiểm tra localStorage có dùng được không
+
+  imgCanvas = $('imgCanvas'); overlayCanvas = $('overlayCanvas');
+  ictx = imgCanvas.getContext('2d'); octx = overlayCanvas.getContext('2d');
+  setupCanvases(800, 480);
+
+  buildNav();
+  bindStageEvents();
+  bindUI();
+  updateReadout();
+
+  loadAllSegmentsFromStorage(); // ← Đồng bộ, không cần await
+  refreshResultsTable(); refreshChart(); refreshSummary();
+}
+
+init();
+</script>
+</body>
+</html>
